@@ -16,9 +16,11 @@ ui <- fluidPage(
     column(5,tags$h1("NNT computation"))
           ),
   
-  tags$h5("This app allows you to easily compute the number needed to treat. It was developed at", tags$a(href="https://i-pri.org/",tags$u("iPRI")),"in the context of the following article:"),
-  tags$em("Patrick Mullie, Gilles Guillot, Philippe Autier, Cécile Pizot, Peter Boyle. Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns."),
-  tags$h5("This app used the R package NNT available", tags$a(href= "https://github.com/gilles-guillot/NNT",tags$u("here."))),
+  tags$h5("This app computes the number needed to treat and a confidence interval. It was developed at", 
+          tags$a(href="https://i-pri.org/",tags$u("iPRI")),"in the context of the article:"),
+  tags$em("Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns. Mullie P., G. Guillot, C. Pizot, Ph. Autier, Peter Boyle. "),
+  tags$h5("This app use the R package NNT available from", tags$a(href= "https://github.com/gilles-guillot/NNT",
+                                                                   tags$u("github.com/gilles-guillot/NNT"))),
 
   tags$br(),
   
