@@ -17,7 +17,7 @@ ui <- fluidPage(
           ),
   
   tags$h5("This app provides a graphical interface to the R package NNT",
-  tags$a(href= "https://github.com/gilles-guillot/NNT",tags$u("(github.com/gilles-guillot/NNT)."))),
+  tags$a(href= "https://github.com/biostat-ipri/NNT",tags$u("(github.com/biostat-ipri/NNT)."))),
   tags$h5("It computes the number needed to treat and the corresponding confidence interval."),
   tags$h5("It was developed at", 
           tags$a(href="https://i-pri.org/",tags$u("iPRI")),
@@ -60,7 +60,7 @@ ui <- fluidPage(
   fluidRow(
     column(3),
     column(3,numericInput(inputId = "alpha", 
-                        label = "Enter your alpha error (in %)",
+                        label = "Enter 1-confidence level (alpha, by default 5%)",
                         value = "5",
                         min=0,
                         max=100))
