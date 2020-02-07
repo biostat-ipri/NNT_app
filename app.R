@@ -21,7 +21,7 @@ ui <- fluidPage(
   tags$h5("It computes the number needed to treat and the corresponding confidence interval."),
   tags$h5("It was developed at", 
           tags$a(href="https://i-pri.org/",tags$u("iPRI")),
-          "in the context of the article \"Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns\"
+          "for a study published as \"Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns\"
           , P. Mullie, G. Guillot, C. Pizot, P. Autier, P. Boyle."),
  
   tags$br(),
