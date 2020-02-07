@@ -91,19 +91,31 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   NNT_computation <- eventReactive(input$button_compute,{
-    torf <- NA %in% c(input$cases1,input$cases2,input$py1,input$py2,input$alpha)
-    if(!torf){
-      compute_NNT(c(input$cases1,input$cases2),c(input$py1,input$py2),input$alpha/100)
+    empty_val <- NA %in% c(input$cases1,input$cases2,input$py1,input$py2,input$alpha)
+    neg_val <- (TRUE %in% (c(input$cases1,input$cases2,input$py1,input$py2)<0) | TRUE %in% (c(input$py1,input$py2)==0))
+    alpha_out <- (input$alpha>=100 | input$alpha<=0)
+    if(!empty_val){
+      if(!neg_val){
+        if(!alpha_out){
+          compute_NNT(c(input$cases1,input$cases2),c(input$py1,input$py2),input$alpha/100)
+        }else{
+          list("ARR"="alpha_out",CI_ARR=c("alpha_out","alpha_out"),"NNT"=c("alpha_out"),"CI_NNT"=c("alpha_out","alpha_out"))
+        }
+      }else{
+        list("ARR"="neg",CI_ARR=c("neg","neg"),"NNT"=c("neg"),"CI_NNT"=c("neg","neg"))
+      }
     }else{
       list("ARR"=NA,CI_ARR=c(NA,NA),"NNT"=c(NA),"CI_NNT"=c(NA,NA))
     }
   })
   
+  # alpha_val <-
+  
   output$ARR <- renderText({
     ARR <- NNT_computation()[["ARR"]]
     ARR_CI <- NNT_computation()[["CI_ARR"]]
-    if(!is.na(ARR) & ARR>0){
-      paste("The absolute risk reduction is: ",format(round(ARR,5),nsmall=5)," with ",100-input$alpha,"%CI ",paste("[",paste(format(round(ARR_CI,5),nsmall=5),collapse="; "),"]"),sep="")
+    if(!is.na(ARR) & ARR!="neg" & ARR!="alpha_out" & ARR>0){
+      paste("The absolute risk reduction is: ",format(round(ARR,5),nsmall=5)," with ",100-isolate(input$alpha),"%CI ",paste("[",paste(format(round(ARR_CI,5),nsmall=5),collapse="; "),"]"),sep="")
     }
   })
   
@@ -111,14 +123,16 @@ server <- function(input, output) {
     ARR <- NNT_computation()[["ARR"]]
     NNT <- NNT_computation()[["NNT"]]
     NNT_CI <- NNT_computation()[["CI_NNT"]]
-    if(!is.na(NNT) & ARR>0){
-      paste("The number needed to treat is: ",round(NNT)," with ",100-input$alpha,"%CI ",paste("[",paste(round(NNT_CI),collapse="; "),"]"),sep="")
+    if(!is.na(NNT) & ARR!="neg" & ARR!="alpha_out" & ARR>0){
+      paste("The number needed to treat is: ",round(NNT)," with ",100-isolate(input$alpha),"%CI ",paste("[",paste(round(NNT_CI),collapse="; "),"]"),sep="")
     }
   })
   #
   output$Error <- renderText({
-    if(is.na(NNT_computation()[["ARR"]])){"Warning: Some values are missing!"}  
-    else if(NNT_computation()[["ARR"]]<=0){"Warning: The absolute risk reduction is negative or null, check your data!"}
+    if(is.na(NNT_computation()[["ARR"]])){"Warning: some values are missing!"}  
+    else if(NNT_computation()[["ARR"]]=="neg"){"Warning: some values are negative or PYs are null, check your data!"} 
+    else if(NNT_computation()[["ARR"]]=="alpha_out"){"Warning: your alpha is out of bound, choose an alpha in the interval ]0-100[."} 
+    else if(NNT_computation()[["ARR"]]<=0){"Warning: the absolute risk reduction is negative or null, check your data!"}
   })
   
 
