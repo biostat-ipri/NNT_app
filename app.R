@@ -6,7 +6,6 @@
 
 library(shiny)
 library(devtools)
-#install_github('gilles-guillot/NNT')  #new
 library(NNT)
 
 ui <- fluidPage(
@@ -18,7 +17,7 @@ ui <- fluidPage(
   
   tags$h5("This app provides a graphical interface to the R package NNT",
   tags$a(href= "https://github.com/biostat-ipri/NNT",tags$u("(github.com/biostat-ipri/NNT)."))),
-  tags$h5("It computes the number needed to treat and the corresponding confidence interval."),
+  tags$h5("It computes the number needed to treat to save one case, and the corresponding confidence interval."),
   tags$h5("It was developed at", 
           tags$a(href="https://i-pri.org/",tags$u("iPRI")),
           "for a study published as \"Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns\"
@@ -94,10 +93,15 @@ server <- function(input, output) {
     empty_val <- NA %in% c(input$cases1,input$cases2,input$py1,input$py2,input$alpha)
     neg_val <- (TRUE %in% (c(input$cases1,input$cases2,input$py1,input$py2)<0) | TRUE %in% (c(input$py1,input$py2)==0))
     alpha_out <- (input$alpha>=100 | input$alpha<=0)
+    moreCases <- (input$cases1>input$py1 | input$cases2>input$py2)
     if(!empty_val){
       if(!neg_val){
         if(!alpha_out){
-          compute_NNT(c(input$cases1,input$cases2),c(input$py1,input$py2),input$alpha/100)
+            if(!moreCases){
+              compute_NNT(c(input$cases1,input$cases2),c(input$py1,input$py2),input$alpha/100)
+            }else{
+              list("ARR"="more_cases",CI_ARR=c("more_cases","more_cases"),"NNT"=c("more_cases"),"CI_NNT"=c("more_cases","more_cases"))
+            }
         }else{
           list("ARR"="alpha_out",CI_ARR=c("alpha_out","alpha_out"),"NNT"=c("alpha_out"),"CI_NNT"=c("alpha_out","alpha_out"))
         }
@@ -114,8 +118,8 @@ server <- function(input, output) {
   output$ARR <- renderText({
     ARR <- NNT_computation()[["ARR"]]
     ARR_CI <- NNT_computation()[["CI_ARR"]]
-    if(!is.na(ARR) & ARR!="neg" & ARR!="alpha_out" & ARR>0){
-      paste("The absolute risk reduction is: ",format(round(ARR,5),nsmall=5)," with ",100-isolate(input$alpha),"%CI ",paste("[",paste(format(round(ARR_CI,5),nsmall=5),collapse="; "),"]"),sep="")
+    if(!is.na(ARR) & ARR!="neg" & ARR!="alpha_out" & ARR!="more_cases" & ARR>0){
+      paste("The absolute risk reduction is: ",format(round(ARR,5),nsmall=5)," with ",100-isolate(input$alpha),"%CI ",paste("[",paste(format(round(ARR_CI,5),nsmall=5),collapse="; "),"]."),sep="")
     }
   })
   
@@ -123,15 +127,21 @@ server <- function(input, output) {
     ARR <- NNT_computation()[["ARR"]]
     NNT <- NNT_computation()[["NNT"]]
     NNT_CI <- NNT_computation()[["CI_NNT"]]
-    if(!is.na(NNT) & ARR!="neg" & ARR!="alpha_out" & ARR>0){
-      paste("The number needed to treat is: ",round(NNT)," with ",100-isolate(input$alpha),"%CI ",paste("[",paste(round(NNT_CI),collapse="; "),"]"),sep="")
+    if(!is.na(NNT) & ARR!="neg" & ARR!="alpha_out" & ARR!="more_cases" & ARR>0){
+      if(length(NNT_CI)==4){
+        CI2print <- paste("]",paste(round(NNT_CI)[1:2],collapse="; "),"] U [",paste(round(NNT_CI)[3:4],collapse="; "),"[.")
+      }else{
+        CI2print <- paste("[",paste(round(NNT_CI),collapse="; "),"].")
+      }
+      paste("The number needed to treat is: ",round(NNT)," with ",100-isolate(input$alpha),"%CI ",CI2print,sep="")
     }
   })
-  #
+ 
   output$Error <- renderText({
     if(is.na(NNT_computation()[["ARR"]])){"Warning: some values are missing!"}  
     else if(NNT_computation()[["ARR"]]=="neg"){"Warning: some values are negative or PYs are null, check your data!"} 
     else if(NNT_computation()[["ARR"]]=="alpha_out"){"Warning: your alpha is out of bound, choose an alpha in the interval ]0-100[."} 
+    else if(NNT_computation()[["ARR"]]=="more_cases"){"Warning: you entered more cases than PYs, check your data!"} 
     else if(NNT_computation()[["ARR"]]<=0){"Warning: the absolute risk reduction is negative or null, check your data!"}
   })
   
