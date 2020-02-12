@@ -40,7 +40,7 @@ ui <- fluidPage(
                         value = "",
                         min=0)),
     column(4,numericInput(inputId = "py1", 
-                          label = "Enter the number of PY in the first exposure group",
+                          label = "Enter the number of person-years in the first exposure group",
                           value = "",
                           min=1))
           ),
@@ -52,7 +52,7 @@ ui <- fluidPage(
                           value = "",
                           min=0)),
     column(4,numericInput(inputId = "py2", 
-                          label = "Enter the number of PY in the second exposure group",
+                          label = "Enter the number of person-years in the second exposure group",
                           value = "",
                           min=1))
           ),
@@ -90,7 +90,9 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
-  NNT_computation <- eventReactive(input$button_compute,{
+  # print(file.exists("www/Help.pdf"))
+  
+    NNT_computation <- eventReactive(input$button_compute,{
     empty_val <- NA %in% c(input$cases1,input$cases2,input$py1,input$py2,input$alpha)
     neg_val <- (TRUE %in% (c(input$cases1,input$cases2,input$py1,input$py2)<0) | TRUE %in% (c(input$py1,input$py2)==0))
     alpha_out <- (input$alpha>=100 | input$alpha<=0)
@@ -114,7 +116,6 @@ server <- function(input, output) {
     }
   })
   
-  # alpha_val <-
   
   output$ARR <- renderText({
     ARR <- NNT_computation()[["ARR"]]
@@ -142,8 +143,8 @@ server <- function(input, output) {
     if(is.na(NNT_computation()[["ARR"]])){"Warning: some values are missing!"}  
     else if(NNT_computation()[["ARR"]]=="neg"){"Warning: some values are negative or PYs are null, check your data!"} 
     else if(NNT_computation()[["ARR"]]=="alpha_out"){"Warning: your alpha is out of bound, choose an alpha in the interval ]0-100[."} 
-    else if(NNT_computation()[["ARR"]]=="more_cases"){"Warning: you entered more cases than PYs, check your data!"} 
-    else if(NNT_computation()[["ARR"]]<=0){"Warning: the absolute risk reduction is negative or null, check your data!"}
+    else if(NNT_computation()[["ARR"]]=="more_cases"){"Warning: you entered more cases than person-years, check your data!"} 
+    else if(NNT_computation()[["ARR"]]<=0){"Warning: the incidence in group 2 is higher than in group 1 (or is the same), check your data!"}
   })
   
 
