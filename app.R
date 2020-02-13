@@ -8,6 +8,7 @@ library(shiny)
 library(devtools)
 library(NNT)
 
+
 ui <- fluidPage(
   
   fluidRow(
@@ -18,12 +19,12 @@ ui <- fluidPage(
   tags$h5("This app provides a graphical interface to the R package NNT",
   tags$a(href= "https://github.com/biostat-ipri/NNT",tags$u("(github.com/biostat-ipri/NNT)."))),
   tags$h5("It computes the number needed to treat to save one case, and the corresponding confidence interval. For more information about how to use this App",
-          tags$a(href="www/Help.pdf",target="_blank",tags$u("click here."))),
+          tags$a(href="Help.pdf",target="_blank",tags$u("click here."))),
   tags$h5("It was developed at", 
           tags$a(href="https://i-pri.org/",tags$u("iPRI")),
           "for a study published as \"Efforts needed for preventing breast and colorectal cancer through changes in dietary patterns\"
           , P. Mullie, G. Guillot, C. Pizot, P. Autier, P. Boyle."),
- 
+  
   tags$br(),
   tags$br(),
 
@@ -85,12 +86,9 @@ ui <- fluidPage(
   
   textOutput("ARR")
   
-  # plotOutput("plot")
 )
 
 server <- function(input, output) {
-  
-  # print(file.exists("www/Help.pdf"))
   
     NNT_computation <- eventReactive(input$button_compute,{
     empty_val <- NA %in% c(input$cases1,input$cases2,input$py1,input$py2,input$alpha)
@@ -146,13 +144,6 @@ server <- function(input, output) {
     else if(NNT_computation()[["ARR"]]=="more_cases"){"Warning: you entered more cases than person-years, check your data!"} 
     else if(NNT_computation()[["ARR"]]<=0){"Warning: the incidence in group 2 is higher than in group 1 (or is the same), check your data!"}
   })
-  
-
- 
-  # output$plot <- renderPlot({
-  #   title <- "NNT with CI"
-  #   plot(c(input$cases1,input$cases2),c(input$py1,input$py2),main=title)
-  # })
   
 }
 
