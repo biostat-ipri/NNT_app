@@ -1,7 +1,8 @@
 Title: NNT
 Author: "iPRI Biostat group""
+Description: Shiny App associated to the NNT package
 AuthorUrl: https://i-pri.org/about-us/expertise-and-services/selection/
 License: MIT
-DisplayMode: Showcase
+DisplayMode: normal
 Type: Shiny
 Version: 0.0.900
