@@ -1,0 +1,12 @@
+name: NNT_app
+title: NNT_app
+username:
+account: i-pri
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1805866
+bundleId: 2798025
+url: https://i-pri.shinyapps.io/NNT_app/
+when: 1581604124.96911
+asMultiple: FALSE
+asStatic: FALSE

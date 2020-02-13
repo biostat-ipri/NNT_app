@@ -6,6 +6,7 @@
 
 library(shiny)
 library(devtools)
+# devtools::install_github('biostat-ipri/NNT')
 library(NNT)
 
 
